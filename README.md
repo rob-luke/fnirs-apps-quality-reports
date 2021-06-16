@@ -15,6 +15,8 @@ See an example report [here](https://rob-luke.github.io/fnirs-apps-quality-repor
 docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app --sci_threshold=0.5
 ```
 
+By default the app will process all subject and tasks.
+You can modify the behaviour of the script using the options below.
 
 ## Arguments
 
