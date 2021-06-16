@@ -8,7 +8,7 @@ RUN conda install --yes \
 
 # TODO: try installing via conda or requirements.txt
 RUN pip install seaborn
-RUN pip install mne
+RUN pip install https://github.com/mne-tools/mne-python/archive/main.zip
 RUN pip install https://codeload.github.com/rob-luke/mne-bids/zip/nirs
 RUN pip install https://github.com/nilearn/nilearn/archive/main.zip
 RUN pip install mne-nirs

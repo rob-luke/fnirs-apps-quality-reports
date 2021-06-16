@@ -6,6 +6,12 @@ import argparse
 from mne_bids import BIDSPath, read_raw_bids
 from glob import glob
 import os.path as op
+from pathlib import Path
+from mne.preprocessing.nirs import optical_density
+from mne_nirs.preprocessing import peak_power, scalp_coupling_index_windowed
+from mne_nirs.visualisation import plot_timechannel_quality_metric
+import matplotlib.pyplot as plt
+from itertools import compress
 
 __version__ = "v0.0.1"
 
@@ -14,7 +20,9 @@ parser = argparse.ArgumentParser(description='Quality Reports')
 parser.add_argument('--bids_dir', default="/bids_dataset", type=str,
                     help='The directory with the input dataset '
                     'formatted according to the BIDS standard.')
-parser.add_argument('--threshold', type=float, default=1.0,
+parser.add_argument('--sci_threshold', type=float, default=0.0,
+                    help='Threshold below which a channel is marked as bad.')
+parser.add_argument('--pp_threshold', type=float, default=0.0,
                     help='Threshold below which a channel is marked as bad.')
 parser.add_argument('--participant_label',
                     help='The label(s) of the participant(s) that should be '
@@ -40,8 +48,6 @@ args = parser.parse_args()
 # Extract parameters
 ########################################
 
-if args.threshold == 1.0:
-    print("No threshold was set, so the status column will not be modified")
 
 ids = []
 # only for a subset of subjects
@@ -69,31 +75,128 @@ else:
 
 
 ########################################
+# Report Sections
+########################################
+
+def plot_raw(raw, report):
+    fig1 = raw.plot(n_channels=len(raw.ch_names),
+                    duration=raw.times[-1],
+                    show_scrollbars=False, clipping=None)
+
+    msg = "Plot of the raw signal"
+    report.add_figs_to_section(fig1, comments=msg,
+                               captions=op.basename(fname) + "_raw",
+                               section="Raw Waveform")
+
+    return raw, report
+
+
+def summarise_triggers(raw, report):
+
+    events, event_dict = mne.events_from_annotations(raw, verbose=False)
+    fig2 = mne.viz.plot_events(events, event_id=event_dict,
+                               sfreq=raw.info['sfreq'])
+    report.add_figs_to_section(fig2, section="Triggers",
+                               captions=op.basename(fname) + "_triggers")
+
+    return raw, report
+
+
+def summarise_montage(raw, report):
+    fig3 = raw.plot_sensors()
+    msg = f"Montage of sensors." \
+          f"Bad channels are marked in red: {raw.info['bads']}"
+    report.add_figs_to_section(fig3, section="Montage", comments=msg,
+                               captions=op.basename(fname) + "_montage")
+
+    return raw, report
+
+
+def summarise_sci(raw, report, threshold=0.8):
+    sci = mne.preprocessing.nirs.scalp_coupling_index(raw,
+                                                      h_trans_bandwidth=0.1)
+    raw.info['bads'] = list(compress(raw.ch_names, sci < threshold))
+
+    fig, ax = plt.subplots()
+    ax.hist(sci)
+    ax.set(xlabel='Scalp Coupling Index', ylabel='Count', xlim=[0, 1])
+    ax.axvline(linewidth=4, color='r', x=threshold)
+
+    msg = f"Scalp coupling index with threshold at {threshold}." \
+          f"Results in bad channels {raw.info['bads']}"
+    report.add_figs_to_section(fig,
+                               comments=msg,
+                               captions=op.basename(fname) + "_SCI",
+                               section="Scalp Coupling Index")
+
+    return raw, report
+
+
+def summarise_sci_window(raw, report, threshold=0.8):
+
+    _, scores, times = scalp_coupling_index_windowed(raw, time_window=60)
+    fig = plot_timechannel_quality_metric(raw, scores, times,
+                                          threshold=threshold,
+                                          title="Scalp Coupling Index "
+                                          "Quality Evaluation")
+    msg = "Windowed SCI."
+    report.add_figs_to_section(fig, section="SCI Windowed", comments=msg,
+                               captions=op.basename(fname) + "_sciwin")
+
+    return raw, report
+
+
+def summarise_pp(raw, report, threshold=0.8):
+
+    _, scores, times = peak_power(raw, time_window=10)
+    fig = plot_timechannel_quality_metric(raw, scores, times,
+                                          threshold=threshold,
+                                          title="Peak Power "
+                                          "Quality Evaluation")
+    msg = "Windowed Peak Power."
+    report.add_figs_to_section(fig, section="Peak Power", comments=msg,
+                               captions=op.basename(fname) + "_pp")
+
+    return raw, report
+
+
+def summarise_odpsd(raw, report):
+
+    fig, ax = plt.subplots(ncols=2, figsize=(15, 8))
+
+    raw.plot_psd(ax=ax[0])
+    raw.plot_psd(ax=ax[1], average=True)
+    ax[1].set_title("Average +- std")
+
+    msg = "PSD of the optical density signal."
+    report.add_figs_to_section(fig, section="OD PSD", comments=msg,
+                               captions=op.basename(fname) + "ODPSD")
+
+    return raw, report
+
+
+########################################
 # Main script
 ########################################
 
 print(" ")
+Path("/bids_dataset/derivatives/fnirs-apps-quality-reports/").\
+    mkdir(parents=True, exist_ok=True)
 for id in ids:
-    for task in tasks:
-        b_path = BIDSPath(subject=id, task=task,
-                          root="/bids_dataset",
-                          datatype="nirs", suffix="nirs",
-                          extension=".snirf")
-        try:
-            raw = read_raw_bids(b_path, verbose=True)
-            raw = mne.preprocessing.nirs.optical_density(raw)
-            sci = mne.preprocessing.nirs.scalp_coupling_index(raw)
-            fname_chan = b_path.update(suffix='channels',
-                                       extension='.tsv').fpath
-            chans = pd.read_csv(fname_chan, sep='\t')
-            for idx in range(len(raw.ch_names)):
-                assert raw.ch_names[idx] == chans["name"][idx]
-            chans["SCI"] = sci
-            if args.threshold < 1.0:
-                chans["status"] = sci > args.threshold
-            chans.to_csv(fname_chan, sep='\t', index=False)
-        except FileNotFoundError:
-            print(f"Unable to process {b_path.fpath}")
-        else:
-            print(f"Unknown error processing {b_path.fpath}")
+    report = mne.Report(verbose=True, raw_psd=True)
+    report.parse_folder(f"/bids_dataset/sub-{id}", render_bem=False)
+    for idx, fname in enumerate(report.fnames):
+        if mne.report._endswith(fname, 'nirs'):
+            raw = mne.io.read_raw_snirf(fname)
+            raw, report = plot_raw(raw, report)
+            raw, report = summarise_triggers(raw, report)
+            raw = optical_density(raw)
+            raw, report = summarise_sci_window(raw, report, threshold=args.sci_threshold)
+            raw, report = summarise_pp(raw, report, threshold=args.pp_threshold)
+            raw, report = summarise_sci(raw, report, threshold=args.sci_threshold)
+            raw, report = summarise_montage(raw, report)
+
+            report.save("/bids_dataset/derivatives/fnirs-apps-quality-reports/"
+                        f"report_basic_{id}.html",
+                        overwrite=True, open_browser=False)
 

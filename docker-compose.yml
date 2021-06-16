@@ -8,4 +8,4 @@ services:
     image: fnirs-apps/qr
     volumes:
       - /Volumes/MassStorage2TB/rluke/Repositories/BIDS-NIRS-Tapping/:/bids_dataset
-    command: []
+    command: ["--sci_threshold", "0.6"]
