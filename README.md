@@ -16,9 +16,10 @@ docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-r
 
 ## Arguments
 
-|            | Required | Default | Note                                                   |
-|------------|----------|---------|--------------------------------------------------------|
-| threshold  | optional | NA      | If not present then the status column is not modified. |
+|                | Required | Default | Note                                                   |
+|----------------|----------|---------|--------------------------------------------------------|
+| sci_threshold  | optional | 0.0     | Threshold applied in the scalp coupling index figures. |
+| pp_threshold   | optional | 0.0     | Threshold applied in the peak power figures.           |
 
 
 
