@@ -1,0 +1,11 @@
+version: "3.1"
+
+services:
+  qr:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: fnirs-apps/qr
+    volumes:
+      - /Volumes/MassStorage2TB/rluke/Repositories/BIDS-NIRS-Tapping/:/bids_dataset
+    command: []
