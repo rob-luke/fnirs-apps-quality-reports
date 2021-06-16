@@ -4,13 +4,15 @@
 
 Portable fNIRS neuroimaging pipelines that work with BIDS datasets. See http://fnirs-apps.org
 
-This app produces a quality report for the data and saves it in `derivatives/fnirs-apps-quality-reports`.
+This app produces a quality report.
 Reports are html documents.
+See an example report [here](https://rob-luke.github.io/fnirs-apps-quality-reports/report_basic_02.html).
+
 
 ## Usage
 
 ```bash
-docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app
+docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app --sci_threshold=0.5
 ```
 
 
