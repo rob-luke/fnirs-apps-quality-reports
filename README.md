@@ -26,7 +26,7 @@ You can modify the behaviour of the script using the options below.
 | pp_threshold   | optional | 0.0     | Threshold applied in the peak power figures.           |
 | participant_label  | optional | []     | Threshold applied in the peak power figures.           |
 
---
+
 
 An example of how to use these arguments:
 ```bash
