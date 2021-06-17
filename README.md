@@ -24,7 +24,7 @@ You can modify the behaviour of the script using the options below.
 |----------------|----------|---------|--------------------------------------------------------|
 | sci_threshold  | optional | 0.0     | Threshold applied in the scalp coupling index figures. |
 | pp_threshold   | optional | 0.0     | Threshold applied in the peak power figures.           |
-| participant_label  | optional | []     | Threshold applied in the peak power figures.           |
+| participant_label  | optional | []     | Participants to process. Default is to process all. |
 
 
 
@@ -33,6 +33,13 @@ An example of how to use these arguments:
 docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app --sci_threshold=0.5 --pp_threshold=0.6 --participant_label 06
 ```
 
+## Updating
+
+To update to the latest version run.
+
+```bash
+docker pull ghcr.io/rob-luke/fnirs-apps-quality-reports/app
+```
 
 Acknowledgements
 ----------------
