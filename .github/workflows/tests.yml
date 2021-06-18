@@ -1,0 +1,38 @@
+name: "Tests"
+on:
+- pull_request
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          
+      - name: Download test data
+        shell: bash -el {0}
+        run: |
+          curl -L https://github.com/rob-luke/BIDS-NIRS-Tapping/archive/master.zip --output data.zip
+          pwd
+          unzip data.zip -d ~/example_data
+          ls
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build docker image
+        run: docker-compose build
+
+      - name: Run docker image
+        run: docker-compose up
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Formatted_BIDS_Dataset
+          path: /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives
