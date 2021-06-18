@@ -7,5 +7,5 @@ services:
       dockerfile: Dockerfile
     image: fnirs-apps/qr
     volumes:
-      - /Volumes/MassStorage2TB/rluke/Repositories/BIDS-NIRS-Tapping/:/bids_dataset
+      - /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset
     command: ["--sci_threshold", "0.6"]
