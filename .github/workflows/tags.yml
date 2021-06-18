@@ -38,3 +38,9 @@ jobs:
 
       - name: Push image to github
         run: docker push ghcr.io/rob-luke/fnirs-apps-quality-reports/app:${{ env.RELEASE_VERSION }}
+
+      - name: Tag image
+        run: docker tag ghcr.io/${GITHUB_REPOSITORY}/${GITHUB_REF##*/} ghcr.io/rob-luke/fnirs-apps-quality-reports/app
+
+      - name: Push image to github
+        run: docker push ghcr.io/rob-luke/fnirs-apps-quality-reports/app:latest
