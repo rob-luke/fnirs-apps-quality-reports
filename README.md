@@ -2,14 +2,18 @@
 
 [![build](https://github.com/rob-luke/fnirs-apps-quality-reports/actions/workflows/ghregistry.yml/badge.svg)](https://github.com/rob-luke/fnirs-apps-quality-reports/actions/workflows/ghregistry.yml)
 
-Portable fNIRS neuroimaging pipelines that work with BIDS datasets. See http://fnirs-apps.org
-
-This app produces a quality report.
+This [*fNIRS App*](http://fnirs-apps.org) will produce data quality reports for all measurements in your BIDS dataset.
 Reports are html documents.
 See an example report [here](https://rob-luke.github.io/fnirs-apps-quality-reports/example_report.html).
 
 
 ## Usage
+
+To run the app you must have [docker installed](https://docs.docker.com/get-docker/). See here for details about [installing fNIRS Apps](http://fnirs-apps.org/details/). You do NOT need to have MATLAB or python installed, and you do not need any scripts.
+
+To run the app you must inform it where the `bids_dataset` to be formatted resides.
+This is done by passing the app the location of the dataset using the `-v` command.
+To run this app use the command:
 
 ```bash
 docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app
