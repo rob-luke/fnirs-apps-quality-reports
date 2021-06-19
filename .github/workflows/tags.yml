@@ -48,7 +48,7 @@ jobs:
       - name: Download test data
         shell: bash -el {0}
         run: |
-          curl -L https://github.com/rob-luke/BIDS-NIRS-Tapping/archive/00-Raw-data.zip --output data.zip
+          curl -L https://github.com/rob-luke/BIDS-NIRS-Tapping/archive/master.zip --output data.zip
           pwd
           unzip data.zip -d ~/example_data
           ls
@@ -57,12 +57,17 @@ jobs:
         run: docker build --progress=plain -t test .
         
       - name: Run docker image
-        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-00-Raw-data/:/bids_dataset test --sci_threshold 0.6 --pp_threshold 0.6
+        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset test --sci_threshold 0.6 --pp_threshold 0.6
     
       - name: Copy example report
         shell: bash -el {0}
         run: |
-          cp /home/runner/example_data/BIDS-NIRS-Tapping-00-Raw-data/derivatives/fnirs-apps-quality-reports/report_basic_04.html example_report.html
+          ls /home/runner
+          ls /home/runner/example_data
+          ls /home/runner/example_data/BIDS-NIRS-Tapping-master
+          ls /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives
+          ls /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports
+          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html example_report.html
           pwd
           ls
         
