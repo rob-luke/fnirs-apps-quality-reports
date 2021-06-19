@@ -36,3 +36,15 @@ jobs:
         with:
           name: Formatted_BIDS_Dataset
           path: /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives
+
+      - name: Build docker image
+        run: docker build --progress=plain -t test .
+          
+      - name: Run docker image
+        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset test --participant_label 03
+        
+      - name: Run docker image
+        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset test --participant_label 03 --pp_threshold 0.6
+        
+      - name: Run docker image
+        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset test --participant_label 03 --pp_threshold 0.6 --sci_threshold 0.8
