@@ -30,7 +30,7 @@ You can modify the behaviour of the script using the options below.
 
 An example of how to use these arguments:
 ```bash
-docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app --sci_threshold=0.5 --pp_threshold=0.6 --participant_label 06
+docker run -v /path/to/data/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app --sci_threshold 0.5 --pp_threshold 0.6 --participant_label 06
 ```
 
 ## Updating
