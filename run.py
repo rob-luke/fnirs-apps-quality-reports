@@ -188,7 +188,7 @@ def summarise_odpsd(raw, report):
 
     msg = "PSD of the optical density signal."
     report.add_figs_to_section(fig, section="OD PSD", comments=msg,
-                               captions=op.basename(fname) + "ODPSD")
+                               captions=op.basename(fname) + "_psd")
 
     return raw, report
 
@@ -209,6 +209,7 @@ for id in ids:
             raw, report = plot_raw(raw, report)
             raw, report = summarise_triggers(raw, report)
             raw = optical_density(raw)
+            raw, report = summarise_odpsd(raw, report)
             raw, report = summarise_sci_window(raw, report, threshold=args.sci_threshold)
             raw, report = summarise_pp(raw, report, threshold=args.pp_threshold)
             raw, report = summarise_sci(raw, report, threshold=args.sci_threshold)
