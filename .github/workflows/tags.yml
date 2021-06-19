@@ -57,7 +57,7 @@ jobs:
         run: docker build --progress=plain -t test .
         
       - name: Run docker image
-        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-00-Raw-data/:/bids_dataset test --threshold 0.6
+        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-00-Raw-data/:/bids_dataset test 0.6
         
       - uses: stefanzweifel/git-auto-commit-action@v4
         name: Release new example file
