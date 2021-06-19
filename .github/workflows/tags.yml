@@ -67,14 +67,22 @@ jobs:
           ls /home/runner/example_data/BIDS-NIRS-Tapping-master
           ls /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives
           ls /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports
-          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html example_report.html
-          pwd
           ls
-        
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        name: Release new example file
+
+      - name: Commit documentation changes
+        run: |
+          git clone https://github.com/mne-tools/mne-nirs.git --branch gh-pages --single-branch gh-pages
+          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html gh-pages/
+          cd gh-pages
+          git config --local user.email "action@github.com"
+          git config --local user.name "Robert Luke"
+          git add example_report.html
+          git commit -m "Update report" -a || true
+          # The above command will fail if no changes were present, so we ignore that.
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          commit_message: New release
           branch: gh-pages
-          file_pattern: example_report.html
-          skip_dirty_check: true
+          directory: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
