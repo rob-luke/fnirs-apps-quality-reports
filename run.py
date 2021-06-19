@@ -83,7 +83,7 @@ tasks = []
 if args.task_label:
     tasks = args.task_label
 else:
-    all_snirfs = glob("/bids_dataset/**/*_nirs.snirf", recursive=True)
+    all_snirfs = glob(f"{args.bids_dir}/**/*_nirs.snirf", recursive=True)
     for a in all_snirfs:
         s = a.split("_task-")[1]
         s = s.split("_nirs.snirf")[0]
@@ -198,11 +198,11 @@ def summarise_odpsd(raw, report):
 ########################################
 
 print(" ")
-Path("/bids_dataset/derivatives/fnirs-apps-quality-reports/").\
+Path(f"{args.bids_dir}/derivatives/fnirs-apps-quality-reports/").\
     mkdir(parents=True, exist_ok=True)
 for id in ids:
     report = mne.Report(verbose=True, raw_psd=True)
-    report.parse_folder(f"/bids_dataset/sub-{id}", render_bem=False)
+    report.parse_folder(f"{args.bids_dir}/sub-{id}", render_bem=False)
     for idx, fname in enumerate(report.fnames):
         if mne.report._endswith(fname, 'nirs'):
             raw = mne.io.read_raw_snirf(fname)
@@ -214,7 +214,7 @@ for id in ids:
             raw, report = summarise_sci(raw, report, threshold=args.sci_threshold)
             raw, report = summarise_montage(raw, report)
 
-            report.save("/bids_dataset/derivatives/fnirs-apps-quality-reports/"
+            report.save(f"{args.bids_dir}/derivatives/fnirs-apps-quality-reports/"
                         f"report_basic_{id}.html",
                         overwrite=True, open_browser=False)
 
