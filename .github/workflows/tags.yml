@@ -77,3 +77,4 @@ jobs:
           commit_message: New release
           branch: gh-pages
           file_pattern: example_report.html
+          skip_dirty_check: true
