@@ -72,8 +72,9 @@ jobs:
       - name: Commit documentation changes
         run: |
           git clone https://github.com/mne-tools/mne-nirs.git --branch gh-pages --single-branch gh-pages
-          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html gh-pages/
+          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html gh-pages/example_report.html
           cd gh-pages
+          ls
           git config --local user.email "action@github.com"
           git config --local user.name "Robert Luke"
           git add example_report.html
