@@ -12,8 +12,26 @@ from mne_nirs.preprocessing import peak_power, scalp_coupling_index_windowed
 from mne_nirs.visualisation import plot_timechannel_quality_metric
 import matplotlib.pyplot as plt
 from itertools import compress
+import os
+import subprocess
 
 __version__ = "v0.0.1"
+
+
+def run(command, env={}):
+    merged_env = os.environ
+    merged_env.update(env)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, shell=True,
+                               env=merged_env)
+    while True:
+        line = process.stdout.readline()
+        line = str(line, 'utf-8')[:-1]
+        print(line)
+        if line == '' and process.poll() != None:
+            break
+    if process.returncode != 0:
+        raise Exception("Non zero return code: %d" % process.returncode)
 
 
 parser = argparse.ArgumentParser(description='Quality Reports')

@@ -14,7 +14,7 @@ RUN pip install https://github.com/nilearn/nilearn/archive/main.zip
 RUN pip install mne-nirs
 RUN pip install h5py
 
-COPY script.py /usr/bin/script.py
+COPY run.py /usr/bin/script.py
 
 RUN mkdir /data
 
