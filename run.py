@@ -15,7 +15,7 @@ from itertools import compress
 import os
 import subprocess
 
-__version__ = "v0.0.7"
+__version__ = "v0.0.13"
 
 
 def run(command, env={}):
