@@ -6,7 +6,7 @@ Portable fNIRS neuroimaging pipelines that work with BIDS datasets. See http://f
 
 This app produces a quality report.
 Reports are html documents.
-See an example report [here](https://rob-luke.github.io/fnirs-apps-quality-reports/report_basic_02.html).
+See an example report [here](https://rob-luke.github.io/fnirs-apps-quality-reports/example_report.html).
 
 
 ## Usage
