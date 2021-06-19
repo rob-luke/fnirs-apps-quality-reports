@@ -71,9 +71,10 @@ jobs:
 
       - name: Commit documentation changes
         run: |
-          git clone https://github.com/mne-tools/mne-nirs.git --branch gh-pages --single-branch gh-pages
-          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html gh-pages/example_report.html
-          cd gh-pages
+          pwd
+          git clone https://github.com/mne-tools/mne-nirs.git --branch gh-pages --single-branch /home/runner/gh-pages
+          cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html /home/runner/gh-pages/example_report.html
+          cd /home/runner/gh-pages
           ls
           git config --local user.email "action@github.com"
           git config --local user.name "Robert Luke"
@@ -85,5 +86,5 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           branch: gh-pages
-          directory: gh-pages
+          directory: /home/runner/gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
