@@ -72,7 +72,7 @@ jobs:
       - name: Commit documentation changes
         run: |
           pwd
-          git clone https://github.com/mne-tools/mne-nirs.git --branch gh-pages --single-branch /home/runner/gh-pages
+          git clone https://github.com/rob-luke/fnirs-apps-quality-reports.git --branch gh-pages --single-branch /home/runner/gh-pages
           cp /home/runner/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-apps-quality-reports/report_basic_04.html /home/runner/gh-pages/example_report.html
           cd /home/runner/gh-pages
           ls
