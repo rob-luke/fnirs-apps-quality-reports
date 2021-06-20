@@ -57,7 +57,7 @@ jobs:
         run: docker build --progress=plain -t test .
         
       - name: Run docker image
-        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset test --sci_threshold 0.6 --pp_threshold 0.6
+        run: docker run -v /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset test --sci-threshold 0.6 --pp-threshold 0.6
     
       - name: Copy example report
         shell: bash -el {0}
