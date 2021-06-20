@@ -1,0 +1,58 @@
+name: "Tests - Boutique"
+on:
+  # Trigger the workflow on push or pull request, but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v1
+
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
+            boutiques
+
+      - name: Download test data
+        shell: bash -el {0}
+        run: |
+          curl -L https://github.com/rob-luke/BIDS-NIRS-Tapping/archive/master.zip --output data.zip
+          pwd
+          unzip data.zip -d ./example_data
+          ls
+
+      - name: Where are we and whats around
+        run: |
+          pwd
+          ls
+
+      - name: Run bosh
+        run: |
+          bosh exec launch fnirsapp_qr.json example_invocation.json --debug
+
+      - name: Where are we and whats around
+        run: |
+          pwd
+          ls
+          ls example_data
+          ls example_data/BIDS-NIRS-Tapping-master
+          ls example_data/BIDS-NIRS-Tapping-master/derivatives
+          ls example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-app-quality-reports
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Bosh output
+          path: |
+            /home/runner/work/fnirs-apps-quality-reports/fnirs-apps-quality-reports/*bosh*
+            example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-app-quality-reports/*

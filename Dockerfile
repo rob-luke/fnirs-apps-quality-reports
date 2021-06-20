@@ -14,6 +14,7 @@ RUN pip install https://github.com/nilearn/nilearn/archive/main.zip
 RUN pip install mne-nirs
 RUN pip install h5py
 
-COPY run.py /run.py
+COPY fnirsapp_qr.py /run.py
+RUN chmod +x /run.py
 
 ENTRYPOINT ["/run.py"]

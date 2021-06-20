@@ -1,0 +1,13 @@
+{
+    "input_datasets": "/home/runner/work/fnirs-apps-quality-reports/fnirs-apps-quality-reports/example_data/BIDS-NIRS-Tapping-master",
+    "output_location": "/home/runner/work/fnirs-apps-quality-reports/fnirs-apps-quality-reports/example_data/BIDS-NIRS-Tapping-master/derivatives/fnirs-app-quality-reports",
+    "subject_label": [
+        "01",
+        "02"
+    ],
+    "task_label": [
+        "tapping"
+    ],
+    "pp_threshold": 0.6,
+    "sci_threshold": 0.7
+}
