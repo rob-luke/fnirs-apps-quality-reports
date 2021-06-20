@@ -6,7 +6,7 @@
     "schema-version": "0.5",
     "command-line": "/run.py [InputDataset] [OutputLocation] [SubjectLabel] [TaskLabel] [SCIThreshold] [PeakPowerThreshold]",
     "container-image": {
-        "image": "ghcr.io/rob-luke/fnirs-apps-glm-pipeline/app",
+        "image": "ghcr.io/rob-luke/fnirs-apps-quality-reports/app",
         "index": "ghcr.io",
         "type": "docker",
         "entrypoint": true
