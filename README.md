@@ -1,6 +1,9 @@
 # fNIRS App: Quality Reports
 
 [![build](https://github.com/rob-luke/fnirs-apps-quality-reports/actions/workflows/ghregistry.yml/badge.svg)](https://github.com/rob-luke/fnirs-apps-quality-reports/actions/workflows/ghregistry.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4999161.svg)](https://doi.org/10.5281/zenodo.4999161)
+
+
 
 This [*fNIRS App*](http://fnirs-apps.org) will produce data quality reports for all measurements in your BIDS dataset.
 Reports are html documents.

@@ -96,5 +96,6 @@
     ],
     "custom": {
         "BIDSAppSpecVersion": "Draft"
-    }
+    },
+    "doi": "10.5281/zenodo.4999161"
 }
