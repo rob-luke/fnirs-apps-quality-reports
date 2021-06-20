@@ -8,4 +8,4 @@ services:
     image: fnirs-apps/qr
     volumes:
       - /home/runner/example_data/BIDS-NIRS-Tapping-master/:/bids_dataset
-    command: ["--sci_threshold", "0.6"]
+    command: ["--sci-threshold", "0.6"]
