@@ -54,10 +54,17 @@ Or to run a specific version:
 docker run -v /path/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/app:v1.4.2
 ```
 
+
 Acknowledgements
 ----------------
 
-This package uses MNE-Python, MNE-BIDS, and MNE-NIRS under the hood. Please cite those package accordingly.
+This app is directly based on BIDS Apps and BIDS Execution. Please cite those projects when using this app.
+
+BIDS Apps: https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005209
+
+BIDS Execution: https://github.com/bids-standard/bids-specification/issues/313
+
+This app uses MNE-Python, MNE-BIDS, and MNE-NIRS under the hood. Please cite those package accordingly.
 
 MNE-Python: https://mne.tools/dev/overview/cite.html
 
