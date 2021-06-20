@@ -1,6 +1,6 @@
 {
     "name": "fNIRS Apps: Quality Reports",
-    "description": "A GLM pipeline for quality reports",
+    "description": "Generate quality reports for fNIRS data",
     "author": "Robert Luke",
     "tool-version": "v0.1.0",
     "schema-version": "0.5",
