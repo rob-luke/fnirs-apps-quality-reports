@@ -15,7 +15,7 @@ from itertools import compress
 import os
 import subprocess
 
-__version__ = "v0.1.0"
+__version__ = "v0.1.1"
 
 
 def fnirsapp_qr(command, env={}):
