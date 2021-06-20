@@ -1,0 +1,100 @@
+{
+    "name": "fNIRS Apps: Quality Reports",
+    "description": "A GLM pipeline for quality reports",
+    "author": "Robert Luke",
+    "tool-version": "v0.1.0",
+    "schema-version": "0.5",
+    "command-line": "/run.py [InputDataset] [OutputLocation] [SubjectLabel] [TaskLabel] [SCIThreshold] [PeakPowerThreshold]",
+    "container-image": {
+        "image": "ghcr.io/rob-luke/fnirs-apps-quality-reports/app",
+        "index": "ghcr.io",
+        "type": "docker",
+        "entrypoint": true
+    },
+    "inputs": [
+        {
+            "command-line-flag": "--input-datasets",
+            "id": "input_datasets",
+            "description": "The directory with the input dataset formatted according to the BIDS standard.",
+            "name": "input-datasets",
+            "optional": true,
+            "type": "File",
+            "value-key": "[InputDataset]"
+        },
+        {
+            "command-line-flag": "--output-location",
+            "id": "output_location",
+            "description": "The directory where the output files should be stored.",
+            "name": "output-location",
+            "optional": true,
+            "type": "File",
+            "value-key": "[OutputLocation]"
+        },
+        {
+            "command-line-flag": "--subject-label",
+            "description": "The label(s) of the subjects(s) that should be analyzed. The label corresponds to sub-<subject_label> from the BIDS spec (so it does not include \"sub-\"). If this parameter is not provided all subjects should be analyzed. Multiple participants can be specified with a space separated list.",
+            "id": "subject_label",
+            "name": "subject-label",
+            "optional": true,
+            "type": "String",
+            "list": true,
+            "value-key": "[SubjectLabel]"
+        },
+        {
+            "command-line-flag": "--task-label",
+            "description": "The label(s) of the tasks(s) that should be analyzed. The label corresponds to task-<subject_label> from the BIDS spec. If this parameter is not provided all tasks should be analyzed. Multiple tasks can be specified with a space separated list.",
+            "id": "task_label",
+            "name": "task-label",
+            "optional": true,
+            "type": "String",
+            "list": true,
+            "value-key": "[TaskLabel]"
+        },
+        {
+            "command-line-flag": "--sci-threshold",
+            "id": "sci_threshold",
+            "name": "sci-threshold",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[SCIThreshold]"
+        },
+        {
+            "command-line-flag": "--pp-threshold",
+            "id": "pp_threshold",
+            "name": "pp-threshold",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[PeakPowerThreshold]"
+        }
+    ],
+    "output-files": [
+        {
+            "id": "output_directory",
+            "name": "BIDS derivatives directory",
+            "optional": false,
+            "path-template": "[OutputLocation]"
+        }
+    ],
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    },
+    "tags": {
+        "domain": [
+            "neuroimaging",
+            "fnirs",
+            "quality",
+            "bids"
+        ]
+    },
+    "error-codes": [
+        {
+            "code": 1,
+            "description": "Crashed"
+        }
+    ],
+    "custom": {
+        "BIDSAppSpecVersion": "Draft"
+    }
+}
