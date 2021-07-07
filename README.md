@@ -28,9 +28,11 @@ You can modify the behaviour of the script using the options below.
 
 |                | Required | Default | Note                                                   |
 |----------------|----------|---------|--------------------------------------------------------|
-| sci_threshold  | optional | 0.0     | Threshold applied in the scalp coupling index figures. |
-| pp_threshold   | optional | 0.0     | Threshold applied in the peak power figures.           |
-| participant_label  | optional | []     | Participants to process. Default is to process all. |
+| subject-label  | optional | []      | Subjects to process. Default is to process all.        |
+| session-label  | optional | []      | Sessions to process. Default is to process all.        |
+| task-label     | optional | []      | Task name to use for data. Defaults to use all.        |
+| sci-threshold  | optional | 0.0     | Threshold applied in the scalp coupling index figures. |
+| pp-threshold   | optional | 0.0     | Threshold applied in the peak power figures.           |
 
 
 
