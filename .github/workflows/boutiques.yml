@@ -37,7 +37,11 @@ jobs:
           pwd
           ls
 
-      - name: Run bosh
+      - name: Bosh validate
+        run: |
+          bosh validate fnirsapp_qr.json
+
+      - name: Bosh execute
         run: |
           bosh exec launch fnirsapp_qr.json example_invocation.json --debug
 
