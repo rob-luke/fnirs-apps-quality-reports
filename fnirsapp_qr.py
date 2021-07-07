@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import mne
 import argparse
-from mne_bids import BIDSPath, read_raw_bids
+from mne_bids import BIDSPath, read_raw_bids, get_entity_vals
 from glob import glob
 import os.path as op
 from pathlib import Path
@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from itertools import compress
 import os
 import subprocess
+from mne.utils import logger
 
 __version__ = "v0.1.1"
 
@@ -54,6 +55,14 @@ parser.add_argument('--task-label',
                     'all tasks should be analyzed. Multiple tasks '
                     'can be specified with a space separated list.',
                     nargs="+")
+parser.add_argument('--session-label',
+                    help='The label(s) of the session(s) that should be '
+                    'analyzed. The label corresponds to '
+                    'ses-<session-label> from the BIDS spec (so it does '
+                    'not include "ses-"). If this parameter is not provided '
+                    'all sessions should be analyzed. Multiple sessions '
+                    'can be specified with a space separated list.',
+                    nargs="+")
 parser.add_argument('--sci-threshold', type=float, default=0.0,
                     help='Threshold below which a channel is marked as bad.')
 parser.add_argument('--pp-threshold', type=float, default=0.0,
@@ -63,35 +72,52 @@ parser.add_argument('-v', '--version', action='version',
                     f'{__version__}')
 args = parser.parse_args()
 
+mne.set_log_level("INFO")
+logger.info("\n")
+
 
 ########################################
 # Extract parameters
 ########################################
 
 
-ids = []
-# only for a subset of subjects
+logger.info("Extracting subject metadata.")
+subs = []
 if args.subject_label:
-    ids = args.subject_label
-# for all subjects
+    logger.info("    Subject data provided as input argument.")
+    subs = args.subject_label
 else:
-    subject_dirs = glob(op.join(args.input_datasets, "sub-*"))
-    ids = [subject_dir.split("-")[-1] for
-           subject_dir in subject_dirs]
-    print(f"No participants specified, processing {ids}")
+    logger.info("    Subject data will be extracted from data.")
+    subject_dirs = glob(op.join(args.input_datasets, "sourcedata/sub-*"))
+    subs = [subject_dir.split("-")[-1] for
+            subject_dir in subject_dirs]
+logger.info(f"        Subjects: {subs}")
 
 
+logger.info("Extracting session metadata.")
+sess = []
+if args.session_label:
+    logger.info("    Session data provided as input argument.")
+    sess = args.session_label
+else:
+    logger.info("    Session data will be extracted from data.")
+    session_dirs = glob(op.join(args.input_datasets, "sourcedata/sub-*/ses-*/"))
+    sess = [session_dir.split("-")[-1].replace("/", "") for
+            session_dir in session_dirs]
+    sess = np.unique(sess)
+if len(sess) == 0:
+    sess = [None]
+logger.info(f"        Sessions: {sess}")
+
+
+logger.info("Extracting tasks metadata.")
 tasks = []
 if args.task_label:
+    logger.info("    Task data provided as input argument.")
     tasks = args.task_label
 else:
-    all_snirfs = glob(f"{args.input_datasets}/**/*_nirs.snirf", recursive=True)
-    for a in all_snirfs:
-        s = a.split("_task-")[1]
-        s = s.split("_nirs.snirf")[0]
-        tasks.append(s)
-    tasks = np.unique(tasks)
-    print(f"No tasks specified, processing {tasks}")
+    raise ValueError(f"You must specify a task label, received {args.task_label}")
+logger.info(f"        Tasks: {tasks}")
 
 
 ########################################
@@ -99,6 +125,7 @@ else:
 ########################################
 
 def plot_raw(raw, report):
+    logger.debug("    Creating raw plot")
     fig1 = raw.plot(n_channels=len(raw.ch_names),
                     duration=raw.times[-1],
                     show_scrollbars=False, clipping=None)
@@ -112,6 +139,7 @@ def plot_raw(raw, report):
 
 
 def summarise_triggers(raw, report):
+    logger.debug("    Creating trigger summary")
 
     events, event_dict = mne.events_from_annotations(raw, verbose=False)
     fig2 = mne.viz.plot_events(events, event_id=event_dict,
@@ -123,6 +151,7 @@ def summarise_triggers(raw, report):
 
 
 def summarise_montage(raw, report):
+    logger.debug("    Creating montage summary")
     fig3 = raw.plot_sensors()
     msg = f"Montage of sensors." \
           f"Bad channels are marked in red: {raw.info['bads']}"
@@ -133,6 +162,7 @@ def summarise_montage(raw, report):
 
 
 def summarise_sci(raw, report, threshold=0.8):
+    logger.debug("    Creating SCI summary")
     sci = mne.preprocessing.nirs.scalp_coupling_index(raw,
                                                       h_trans_bandwidth=0.1)
     raw.info['bads'] = list(compress(raw.ch_names, sci < threshold))
@@ -153,6 +183,7 @@ def summarise_sci(raw, report, threshold=0.8):
 
 
 def summarise_sci_window(raw, report, threshold=0.8):
+    logger.debug("    Creating windowed SCI summary")
 
     _, scores, times = scalp_coupling_index_windowed(raw, time_window=60)
     fig = plot_timechannel_quality_metric(raw, scores, times,
@@ -167,6 +198,7 @@ def summarise_sci_window(raw, report, threshold=0.8):
 
 
 def summarise_pp(raw, report, threshold=0.8):
+    logger.debug("    Creating peak power summary")
 
     _, scores, times = peak_power(raw, time_window=10)
     fig = plot_timechannel_quality_metric(raw, scores, times,
@@ -181,6 +213,7 @@ def summarise_pp(raw, report, threshold=0.8):
 
 
 def summarise_odpsd(raw, report):
+    logger.debug("    Creating PSD plot")
 
     fig, ax = plt.subplots(ncols=2, figsize=(15, 8))
 
@@ -202,7 +235,7 @@ def summarise_odpsd(raw, report):
 print(" ")
 Path(f"{args.output_location}/").\
     mkdir(parents=True, exist_ok=True)
-for id in ids:
+for id in subs:
     report = mne.Report(verbose=True, raw_psd=True)
     report.parse_folder(f"{args.input_datasets}/sub-{id}", render_bem=False)
     for idx, fname in enumerate(report.fnames):
