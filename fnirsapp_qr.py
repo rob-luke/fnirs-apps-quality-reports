@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pandas as pd
-import numpy as np
+import matplotlib
 import mne
 import argparse
 from mne_bids import BIDSPath, read_raw_bids, get_entity_vals
@@ -15,6 +15,8 @@ from itertools import compress
 import os
 import subprocess
 from mne.utils import logger
+
+matplotlib.use('agg')
 
 __version__ = "v0.1.1"
 
@@ -88,9 +90,7 @@ if args.subject_label:
     subs = args.subject_label
 else:
     logger.info("    Subject data will be extracted from data.")
-    subject_dirs = glob(op.join(args.input_datasets, "sourcedata/sub-*"))
-    subs = [subject_dir.split("-")[-1] for
-            subject_dir in subject_dirs]
+    subs = get_entity_vals(args.input_datasets, 'subject')
 logger.info(f"        Subjects: {subs}")
 
 
@@ -101,10 +101,7 @@ if args.session_label:
     sess = args.session_label
 else:
     logger.info("    Session data will be extracted from data.")
-    session_dirs = glob(op.join(args.input_datasets, "sourcedata/sub-*/ses-*/"))
-    sess = [session_dir.split("-")[-1].replace("/", "") for
-            session_dir in session_dirs]
-    sess = np.unique(sess)
+    sess = get_entity_vals(args.input_datasets, 'session')
 if len(sess) == 0:
     sess = [None]
 logger.info(f"        Sessions: {sess}")
@@ -116,7 +113,8 @@ if args.task_label:
     logger.info("    Task data provided as input argument.")
     tasks = args.task_label
 else:
-    raise ValueError(f"You must specify a task label, received {args.task_label}")
+    logger.info("    Session data will be extracted from data.")
+    tasks = get_entity_vals(args.input_datasets, 'task')
 logger.info(f"        Tasks: {tasks}")
 
 
@@ -132,7 +130,7 @@ def plot_raw(raw, report):
 
     msg = "Plot of the raw signal"
     report.add_figs_to_section(fig1, comments=msg,
-                               captions=op.basename(fname) + "_raw",
+                               captions=raw.info["subject_info"]["first_name"] + "_raw",
                                section="Raw Waveform")
 
     return raw, report
@@ -145,7 +143,7 @@ def summarise_triggers(raw, report):
     fig2 = mne.viz.plot_events(events, event_id=event_dict,
                                sfreq=raw.info['sfreq'])
     report.add_figs_to_section(fig2, section="Triggers",
-                               captions=op.basename(fname) + "_triggers")
+                               captions=raw.info["subject_info"]["first_name"] + "_triggers")
 
     return raw, report
 
@@ -156,7 +154,7 @@ def summarise_montage(raw, report):
     msg = f"Montage of sensors." \
           f"Bad channels are marked in red: {raw.info['bads']}"
     report.add_figs_to_section(fig3, section="Montage", comments=msg,
-                               captions=op.basename(fname) + "_montage")
+                               captions=raw.info["subject_info"]["first_name"] + "_montage")
 
     return raw, report
 
@@ -176,7 +174,7 @@ def summarise_sci(raw, report, threshold=0.8):
           f"Results in bad channels {raw.info['bads']}"
     report.add_figs_to_section(fig,
                                comments=msg,
-                               captions=op.basename(fname) + "_SCI",
+                               captions=raw.info["subject_info"]["first_name"] + "_SCI",
                                section="Scalp Coupling Index")
 
     return raw, report
@@ -192,7 +190,7 @@ def summarise_sci_window(raw, report, threshold=0.8):
                                           "Quality Evaluation")
     msg = "Windowed SCI."
     report.add_figs_to_section(fig, section="SCI Windowed", comments=msg,
-                               captions=op.basename(fname) + "_sciwin")
+                               captions=raw.info["subject_info"]["first_name"] + "_sciwin")
 
     return raw, report
 
@@ -207,7 +205,7 @@ def summarise_pp(raw, report, threshold=0.8):
                                           "Quality Evaluation")
     msg = "Windowed Peak Power."
     report.add_figs_to_section(fig, section="Peak Power", comments=msg,
-                               captions=op.basename(fname) + "_pp")
+                               captions=raw.info["subject_info"]["first_name"] + "_pp")
 
     return raw, report
 
@@ -223,34 +221,62 @@ def summarise_odpsd(raw, report):
 
     msg = "PSD of the optical density signal."
     report.add_figs_to_section(fig, section="OD PSD", comments=msg,
-                               captions=op.basename(fname) + "_psd")
+                               captions=raw.info["subject_info"]["first_name"] + "_psd")
 
     return raw, report
 
 
 ########################################
+# Report script
+########################################
+
+
+def run_report(path, path_out):
+
+    report = mne.Report(verbose=True, raw_psd=True)
+    report.parse_folder(f"{path.directory}", render_bem=False)
+
+    fname = report.fnames[0]
+    raw = mne.io.read_raw_snirf(fname)
+    raw, report = plot_raw(raw, report)
+    raw, report = summarise_triggers(raw, report)
+    raw = optical_density(raw)
+    raw, report = summarise_odpsd(raw, report)
+    raw, report = summarise_sci_window(raw, report, threshold=args.sci_threshold)
+    raw, report = summarise_pp(raw, report, threshold=args.pp_threshold)
+    raw, report = summarise_sci(raw, report, threshold=args.sci_threshold)
+    raw, report = summarise_montage(raw, report)
+
+    report.save(path_out, overwrite=True, open_browser=False)
+
+    return 1
+
+########################################
 # Main script
 ########################################
 
-print(" ")
-Path(f"{args.output_location}/").\
-    mkdir(parents=True, exist_ok=True)
-for id in subs:
-    report = mne.Report(verbose=True, raw_psd=True)
-    report.parse_folder(f"{args.input_datasets}/sub-{id}", render_bem=False)
-    for idx, fname in enumerate(report.fnames):
-        if mne.report._endswith(fname, 'nirs'):
-            raw = mne.io.read_raw_snirf(fname)
-            raw, report = plot_raw(raw, report)
-            raw, report = summarise_triggers(raw, report)
-            raw = optical_density(raw)
-            raw, report = summarise_odpsd(raw, report)
-            raw, report = summarise_sci_window(raw, report, threshold=args.sci_threshold)
-            raw, report = summarise_pp(raw, report, threshold=args.pp_threshold)
-            raw, report = summarise_sci(raw, report, threshold=args.sci_threshold)
-            raw, report = summarise_montage(raw, report)
+logger.info(" ")
+Path(f"{args.output_location}").mkdir(parents=True, exist_ok=True)
 
-            report.save(f"{args.output_location}/"
-                        f"report_basic_{id}.html",
-                        overwrite=True, open_browser=False)
 
+for sub in subs:
+    for task in tasks:
+        for ses in sess:
+
+            logger.info(f"Processing: sub-{sub}/ses-{ses}/task-{task}")
+            in_path = BIDSPath(subject=sub, task=task, session=ses,
+                               root=f"{args.input_datasets}",
+                               datatype="nirs", suffix="nirs",
+                               extension=".snirf")
+
+            out_path = BIDSPath(subject=sub, task=task, session=ses,
+                                root=f"{args.output_location}",
+                                datatype="nirs", suffix="qualityReport",
+                                extension=".html", check=False)
+
+            if op.exists(in_path):
+                logger.info(f"    Found file: {in_path}")
+                out_path.fpath.parent.mkdir(exist_ok=True, parents=True)
+                run_report(in_path, out_path)
+            else:
+                logger.info(f"    No file exists: {in_path}")
