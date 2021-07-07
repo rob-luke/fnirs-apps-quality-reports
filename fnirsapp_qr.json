@@ -4,7 +4,7 @@
     "author": "Robert Luke",
     "tool-version": "v0.1.0",
     "schema-version": "0.5",
-    "command-line": "/run.py [InputDataset] [OutputLocation] [SubjectLabel] [TaskLabel] [SCIThreshold] [PeakPowerThreshold]",
+    "command-line": "/run.py [InputDataset] [OutputLocation] [SubjectLabel] [SessionLabel] [TaskLabel] [SCIThreshold] [PeakPowerThreshold]",
     "container-image": {
         "image": "ghcr.io/rob-luke/fnirs-apps-quality-reports/app",
         "index": "ghcr.io",
@@ -39,6 +39,16 @@
             "type": "String",
             "list": true,
             "value-key": "[SubjectLabel]"
+        },
+        {
+            "command-line-flag": "--session-label",
+            "description": "The label(s) of the session(s) that should be analyzed. The label corresponds to ses-<session_label> from the BIDS spec (so it does not include \"ses-\"). If this parameter is not provided all sessions should be analyzed. Multiple sessions can be specified with a space separated list.",
+            "id": "session_label",
+            "name": "session-label",
+            "optional": true,
+            "type": "String",
+            "list": true,
+            "value-key": "[SessionLabel]"
         },
         {
             "command-line-flag": "--task-label",
