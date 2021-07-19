@@ -236,8 +236,7 @@ def run_report(path, path_out):
     report = mne.Report(verbose=True, raw_psd=True)
     report.parse_folder(f"{path.directory}", render_bem=False)
 
-    fname = report.fnames[0]
-    raw = mne.io.read_raw_snirf(fname)
+    raw = read_raw_bids(path)
     raw, report = plot_raw(raw, report)
     raw, report = summarise_triggers(raw, report)
     raw = optical_density(raw)
