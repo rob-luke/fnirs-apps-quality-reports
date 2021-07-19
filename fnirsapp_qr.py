@@ -18,7 +18,7 @@ from mne.utils import logger
 
 matplotlib.use('agg')
 
-__version__ = "v0.1.1"
+__version__ = "v0.3.0"
 
 
 def fnirsapp_qr(command, env={}):
