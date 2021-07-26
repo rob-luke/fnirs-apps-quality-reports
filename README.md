@@ -62,6 +62,7 @@ docker run -v /path/:/bids_dataset ghcr.io/rob-luke/fnirs-apps-quality-reports/a
 
 This app is [boutiques compatible](https://boutiques.github.io).
 In addition to the methods described above, this app can also be run using [boutiques bosh command](https://boutiques.github.io/doc/index.html).
+You can see an example usage of this app with boutiques at https://github.com/rob-luke/fnirs-apps-demo.
 
 
 
