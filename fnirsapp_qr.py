@@ -308,7 +308,7 @@ exec_path = f"{args.input_datasets}/execution"
 exec_rep["ExecutionEnd"] = datetime.now().isoformat()
 
 Path(exec_path).mkdir(parents=True, exist_ok=True)
-with open(f"{exec_path}/{exec_rep['ExecutionStart'].replace(':', '-')}.json", "w") as fp:
+with open(f"{exec_path}/{exec_rep['ExecutionStart'].replace(':', '-')}-quality_reports.json", "w") as fp:
     json.dump(exec_rep, fp)
 
 pprint(exec_rep)
