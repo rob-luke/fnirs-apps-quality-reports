@@ -15,10 +15,15 @@ from itertools import compress
 import os
 import subprocess
 from mne.utils import logger
+from pathlib import Path
+from datetime import datetime
+import json
+import hashlib
+from pprint import pprint
 
 matplotlib.use('agg')
 
-__version__ = "v0.3.1"
+__version__ = "v0.3.2"
 
 
 def fnirsapp_qr(command, env={}):
@@ -73,6 +78,19 @@ parser.add_argument('-v', '--version', action='version',
                     version='BIDS-App Scalp Coupling Index version '
                     f'{__version__}')
 args = parser.parse_args()
+
+def create_report(app_name=None, pargs=None):
+
+    exec_rep = dict()
+    exec_rep["ExecutionStart"] = datetime.now().isoformat()
+    exec_rep["ApplicationName"] = app_name
+    exec_rep["ApplicationVersion"] = __version__
+    exec_rep["Arguments"] = vars(pargs)
+
+    return exec_rep
+
+exec_files = dict()
+exec_rep =create_report(app_name="fNIRS-Apps: Quality Reports", pargs=args)
 
 mne.set_log_level("INFO")
 logger.info("\n")
@@ -263,10 +281,15 @@ for sub in subs:
         for ses in sess:
 
             logger.info(f"Processing: sub-{sub}/ses-{ses}/task-{task}")
+            exec_files[f"sub-{sub}_ses-{ses}_task-{task}"] = dict()
+
             in_path = BIDSPath(subject=sub, task=task, session=ses,
                                root=f"{args.input_datasets}",
                                datatype="nirs", suffix="nirs",
                                extension=".snirf")
+
+            exec_files[f"sub-{sub}_ses-{ses}_task-{task}"]["FileName"] = str(in_path.fpath)
+            exec_files[f"sub-{sub}_ses-{ses}_task-{task}"]["FileHash"] = hashlib.md5(open(in_path.fpath, 'rb').read()).hexdigest()
 
             out_path = BIDSPath(subject=sub, task=task, session=ses,
                                 root=f"{args.output_location}",
@@ -279,3 +302,13 @@ for sub in subs:
                 run_report(in_path, out_path)
             else:
                 logger.info(f"    No file exists: {in_path}")
+
+exec_rep["Files"] = exec_files
+exec_path = f"{args.input_datasets}/execution"
+exec_rep["ExecutionEnd"] = datetime.now().isoformat()
+
+Path(exec_path).mkdir(parents=True, exist_ok=True)
+with open(f"{exec_path}/{exec_rep['ExecutionStart'].replace(':', '-')}-quality_reports.json", "w") as fp:
+    json.dump(exec_rep, fp)
+
+pprint(exec_rep)
