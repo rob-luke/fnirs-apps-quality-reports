@@ -23,7 +23,7 @@ from pprint import pprint
 
 matplotlib.use('agg')
 
-__version__ = "v0.3.2"
+__version__ = "v0.3.3"
 
 
 def fnirsapp_qr(command, env={}):
@@ -179,8 +179,16 @@ def summarise_montage(raw, report):
 
 def summarise_sci(raw, report, threshold=0.8):
     logger.debug("    Creating SCI summary")
-    sci = mne.preprocessing.nirs.scalp_coupling_index(raw,
-                                                      h_trans_bandwidth=0.1)
+
+    if raw.info['lowpass'] < 1.5:
+        print("SCI calculation being run over limited frequency range, check if valid.")
+        h_trans_bandwidth = 0.2
+        h_freq = 1.5 - raw.info['lowpass'] - 0.05
+    else:
+        h_freq = 1.5
+        h_trans_bandwidth = 0.3
+
+    sci = mne.preprocessing.nirs.scalp_coupling_index(raw, h_freq=h_freq, h_trans_bandwidth=h_trans_bandwidth)
     raw.info['bads'] = list(compress(raw.ch_names, sci < threshold))
 
     fig, ax = plt.subplots()
@@ -201,7 +209,16 @@ def summarise_sci(raw, report, threshold=0.8):
 def summarise_sci_window(raw, report, threshold=0.8):
     logger.debug("    Creating windowed SCI summary")
 
-    _, scores, times = scalp_coupling_index_windowed(raw, time_window=60)
+    if raw.info['lowpass'] < 1.5:
+        print("SCI calculation being run over limited frequency range, check if valid.")
+        h_trans_bandwidth = 0.2
+        h_freq = 1.5 - raw.info['lowpass'] - 0.05
+    else:
+        h_freq = 1.5
+        h_trans_bandwidth = 0.3
+
+
+    _, scores, times = scalp_coupling_index_windowed(raw, time_window=60, h_freq=h_freq, h_trans_bandwidth=h_trans_bandwidth)
     fig = plot_timechannel_quality_metric(raw, scores, times,
                                           threshold=threshold,
                                           title="Scalp Coupling Index "
@@ -216,7 +233,15 @@ def summarise_sci_window(raw, report, threshold=0.8):
 def summarise_pp(raw, report, threshold=0.8):
     logger.debug("    Creating peak power summary")
 
-    _, scores, times = peak_power(raw, time_window=10)
+    if raw.info['lowpass'] < 1.5:
+        print("PP calculation being run over limited frequency range, check if valid.")
+        h_trans_bandwidth = 0.2
+        h_freq = 1.5 - raw.info['lowpass'] - 0.05
+    else:
+        h_freq = 1.5
+        h_trans_bandwidth = 0.3
+
+    _, scores, times = peak_power(raw, time_window=10, h_freq=h_freq, h_trans_bandwidth=h_trans_bandwidth)
     fig = plot_timechannel_quality_metric(raw, scores, times,
                                           threshold=threshold,
                                           title="Peak Power "
