@@ -23,7 +23,7 @@ from pprint import pprint
 
 matplotlib.use('agg')
 
-__version__ = "v0.3.3"
+__version__ = "v0.3.4"
 
 
 def fnirsapp_qr(command, env={}):
@@ -277,7 +277,7 @@ def summarise_odpsd(raw, report):
 def run_report(path, path_out):
 
     report = mne.Report(verbose=True, raw_psd=True)
-    report.parse_folder(f"{path.directory}", render_bem=False)
+    report.parse_folder(f"{path.directory}", render_bem=False, raw_butterfly=False)
 
     raw = read_raw_bids(path)
     raw, report = plot_raw(raw, report)
