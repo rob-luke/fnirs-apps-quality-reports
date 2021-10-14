@@ -1,4 +1,4 @@
-FROM ghcr.io/mne-tools/mne-python-plot:main
+FROM ghcr.io/mne-tools/mne-python-plot:latest
 
 USER root
 
