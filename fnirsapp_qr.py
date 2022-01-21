@@ -23,7 +23,7 @@ from pprint import pprint
 
 matplotlib.use('agg')
 
-__version__ = "v0.3.5"
+__version__ = "v0.3.6"
 
 
 def fnirsapp_qr(command, env={}):
