@@ -147,9 +147,7 @@ def plot_raw(raw, report):
                     show_scrollbars=False, clipping=None)
 
     msg = "Plot of the raw signal"
-    report.add_figs_to_section(fig1, comments=msg,
-                               captions=raw.info["subject_info"]["first_name"] + "_raw",
-                               section="Raw Waveform")
+    report.add_figure(fig=fig1, caption=msg, title="Raw Waveform")
 
     return raw, report
 
@@ -160,8 +158,7 @@ def summarise_triggers(raw, report):
     events, event_dict = mne.events_from_annotations(raw, verbose=False)
     fig2 = mne.viz.plot_events(events, event_id=event_dict,
                                sfreq=raw.info['sfreq'])
-    report.add_figs_to_section(fig2, section="Triggers",
-                               captions=raw.info["subject_info"]["first_name"] + "_triggers")
+    report.add_figure(fig=fig2, title="Triggers")
 
     return raw, report
 
@@ -171,8 +168,7 @@ def summarise_montage(raw, report):
     fig3 = raw.plot_sensors()
     msg = f"Montage of sensors." \
           f"Bad channels are marked in red: {raw.info['bads']}"
-    report.add_figs_to_section(fig3, section="Montage", comments=msg,
-                               captions=raw.info["subject_info"]["first_name"] + "_montage")
+    report.add_figure(fig=fig3, title="Montage", caption=msg)
 
     return raw, report
 
@@ -198,10 +194,7 @@ def summarise_sci(raw, report, threshold=0.8):
 
     msg = f"Scalp coupling index with threshold at {threshold}." \
           f"Results in bad channels {raw.info['bads']}"
-    report.add_figs_to_section(fig,
-                               comments=msg,
-                               captions=raw.info["subject_info"]["first_name"] + "_SCI",
-                               section="Scalp Coupling Index")
+    report.add_figure(fig=fig, caption=msg, title="Scalp Coupling Index")
 
     return raw, report
 
@@ -224,8 +217,7 @@ def summarise_sci_window(raw, report, threshold=0.8):
                                           title="Scalp Coupling Index "
                                           "Quality Evaluation")
     msg = "Windowed SCI."
-    report.add_figs_to_section(fig, section="SCI Windowed", comments=msg,
-                               captions=raw.info["subject_info"]["first_name"] + "_sciwin")
+    report.add_figure(fig=fig, title="SCI Windowed", caption=msg)
 
     return raw, report
 
@@ -247,8 +239,7 @@ def summarise_pp(raw, report, threshold=0.8):
                                           title="Peak Power "
                                           "Quality Evaluation")
     msg = "Windowed Peak Power."
-    report.add_figs_to_section(fig, section="Peak Power", comments=msg,
-                               captions=raw.info["subject_info"]["first_name"] + "_pp")
+    report.add_figure(fig=fig, title="Peak Power", caption=msg)
 
     return raw, report
 
@@ -263,8 +254,7 @@ def summarise_odpsd(raw, report):
     ax[1].set_title("Average +- std")
 
     msg = "PSD of the optical density signal."
-    report.add_figs_to_section(fig, section="OD PSD", comments=msg,
-                               captions=raw.info["subject_info"]["first_name"] + "_psd")
+    report.add_figure(fig=fig, title="OD PSD", caption=msg)
 
     return raw, report
 
