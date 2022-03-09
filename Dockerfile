@@ -2,7 +2,7 @@ FROM ghcr.io/mne-tools/mne-python-plot:main
 
 USER root
 
-RUN pip install https://codeload.github.com/rob-luke/mne-bids/zip/nirs
+RUN pip install https://github.com/mne-tools/mne-bids/archive/main.zip
 RUN pip install https://github.com/nilearn/nilearn/archive/main.zip
 RUN pip install https://github.com/mne-tools/mne-nirs/archive/main.zip
 RUN pip install h5py
