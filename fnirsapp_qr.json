@@ -2,11 +2,11 @@
     "name": "fNIRS Apps: Quality Reports",
     "description": "Generate quality reports for fNIRS data",
     "author": "Robert Luke",
-    "tool-version": "v0.3.7",
+    "tool-version": "v0.3.8",
     "schema-version": "0.5",
     "command-line": "/run.py [InputDataset] [OutputLocation] [SubjectLabel] [SessionLabel] [TaskLabel] [SCIThreshold] [PeakPowerThreshold]",
     "container-image": {
-        "image": "ghcr.io/rob-luke/fnirs-apps-quality-reports/app:v0.3.7",
+        "image": "ghcr.io/rob-luke/fnirs-apps-quality-reports/app:v0.3.8",
         "index": "ghcr.io",
         "type": "docker",
         "entrypoint": true
