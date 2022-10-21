@@ -51,6 +51,16 @@
             "value-key": "[SessionLabel]"
         },
         {
+            "command-line-flag": "--run-label",
+            "description": "The label(s) of the run(s) that should be analyzed. The label corresponds to run-<session_label> from the BIDS spec (so it does not include \"run-\"). If this parameter is not provided all sessions should be analyzed. Multiple runs can be specified with a space separated list.",
+            "id": "run_label",
+            "name": "run-label",
+            "optional": true,
+            "type": "String",
+            "list": true,
+            "value-key": "[RunLabel]"
+        },
+        {
             "command-line-flag": "--task-label",
             "description": "The label(s) of the tasks(s) that should be analyzed. The label corresponds to task-<subject_label> from the BIDS spec. If this parameter is not provided all tasks should be analyzed. Multiple tasks can be specified with a space separated list.",
             "id": "task_label",
