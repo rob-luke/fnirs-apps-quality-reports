@@ -70,6 +70,14 @@ parser.add_argument('--session-label',
                     'all sessions should be analyzed. Multiple sessions '
                     'can be specified with a space separated list.',
                     nargs="+")
+parser.add_argument('--run-label',
+                    help='The label(s) of the run(s) that should be '
+                    'analyzed. The label corresponds to '
+                    'run-<run-label> from the BIDS spec (so it does '
+                    'not include "run-"). If this parameter is not provided '
+                    'all runs should be analyzed. Multiple runs '
+                    'can be specified with a space separated list.',
+                    nargs="+")
 parser.add_argument('--sci-threshold', type=float, default=0.0,
                     help='Threshold below which a channel is marked as bad.')
 parser.add_argument('--pp-threshold', type=float, default=0.0,
@@ -123,6 +131,19 @@ else:
 if len(sess) == 0:
     sess = [None]
 logger.info(f"        Sessions: {sess}")
+
+
+logger.info("Extracting run metadata.")
+sess = []
+if args.session_label:
+    logger.info("    Run data provided as input argument.")
+    runs = args.session_label
+else:
+    logger.info("    Run data will be extracted from data.")
+    runs = get_entity_vals(args.input_datasets, 'run')
+if len(runs) == 0:
+    runs = [None]
+logger.info(f"        Runs: {runs}")
 
 
 logger.info("Extracting tasks metadata.")
@@ -294,29 +315,45 @@ Path(f"{args.output_location}").mkdir(parents=True, exist_ok=True)
 for sub in subs:
     for task in tasks:
         for ses in sess:
+            for run in runs:
+                if len(runs) > 1 : 
+                    logger.info(f"Processing: sub-{sub}/ses-{ses}/run-{run}/task-{task}")
+                    exec_files[f"sub-{sub}_ses-{ses}_task-{task}_run-{run}"] = dict()
 
-            logger.info(f"Processing: sub-{sub}/ses-{ses}/task-{task}")
-            exec_files[f"sub-{sub}_ses-{ses}_task-{task}"] = dict()
+                    in_path = BIDSPath(subject=sub, task=task, session=ses, run = rub,
+                                       root=f"{args.input_datasets}",
+                                       datatype="nirs", suffix="nirs",
+                                       extension=".snirf")
+                    exec_files[f"sub-{sub}_ses-{ses}_task-{task}_run-{run}"]["FileName"] = str(in_path.fpath)
+                    exec_files[f"sub-{sub}_ses-{ses}_task-{task}_run-{run}"]["FileHash"] = hashlib.md5(open(in_path.fpath, 'rb').read()).hexdigest()
+                    out_path = BIDSPath(subject=sub, task=task, session=ses,run=run,
+                                        root=f"{args.output_location}",
+                                        datatype="nirs", suffix="qualityReport",
+                                        extension=".html", check=False)
+                else
+                    logger.info(f"Processing: sub-{sub}/ses-{ses}/task-{task}")
+                    exec_files[f"sub-{sub}_ses-{ses}_task-{task}"] = dict()
 
-            in_path = BIDSPath(subject=sub, task=task, session=ses,
-                               root=f"{args.input_datasets}",
-                               datatype="nirs", suffix="nirs",
-                               extension=".snirf")
+                    in_path = BIDSPath(subject=sub, task=task, session=ses,
+                                       root=f"{args.input_datasets}",
+                                       datatype="nirs", suffix="nirs",
+                                       extension=".snirf")            
 
-            exec_files[f"sub-{sub}_ses-{ses}_task-{task}"]["FileName"] = str(in_path.fpath)
-            exec_files[f"sub-{sub}_ses-{ses}_task-{task}"]["FileHash"] = hashlib.md5(open(in_path.fpath, 'rb').read()).hexdigest()
+                    exec_files[f"sub-{sub}_ses-{ses}_task-{task}"]["FileName"] = str(in_path.fpath)
+                    exec_files[f"sub-{sub}_ses-{ses}_task-{task}"]["FileHash"] = hashlib.md5(open(in_path.fpath, 'rb').read()).hexdigest()
 
-            out_path = BIDSPath(subject=sub, task=task, session=ses,
-                                root=f"{args.output_location}",
-                                datatype="nirs", suffix="qualityReport",
-                                extension=".html", check=False)
+                    out_path = BIDSPath(subject=sub, task=task, session=ses,
+                                        root=f"{args.output_location}",
+                                        datatype="nirs", suffix="qualityReport",
+                                        extension=".html", check=False)
 
-            if op.exists(in_path):
-                logger.info(f"    Found file: {in_path}")
-                out_path.fpath.parent.mkdir(exist_ok=True, parents=True)
-                run_report(in_path, out_path)
-            else:
-                logger.info(f"    No file exists: {in_path}")
+                if op.exists(in_path):
+                    logger.info(f"    Found file: {in_path}")
+                    out_path.fpath.parent.mkdir(exist_ok=True, parents=True)
+                    run_report(in_path, out_path)
+                else:
+                    logger.info(f"    No file exists: {in_path}")
+                    
 
 exec_rep["Files"] = exec_files
 exec_path = f"{args.input_datasets}/execution"
